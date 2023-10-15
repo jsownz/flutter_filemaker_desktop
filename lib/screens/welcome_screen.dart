@@ -28,21 +28,25 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      const TopBar(),
-      FutureBuilder<bool>(
-        future: showSetupPage(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            if (snapshot.data!) {
-              return const MainScreen();
-            }
-            return const InitialSetupScreen();
-          } else {
-            return const InitialSetupScreen();
-          }
-        },
-      ),
-    ]);
+    return Column(
+      children: [
+        const TopBar(),
+        Expanded(
+          child: FutureBuilder<bool>(
+            future: showSetupPage(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                if (snapshot.data!) {
+                  return const MainScreen();
+                }
+                return const InitialSetupScreen();
+              } else {
+                return const InitialSetupScreen();
+              }
+            },
+          ),
+        ),
+      ],
+    );
   }
 }

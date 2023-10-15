@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:flutter_filemaker_desktop/reusable/colors.dart';
 import 'package:flutter_filemaker_desktop/screens/welcome_screen.dart';
 
 void main() {
@@ -15,7 +16,7 @@ void main() {
   });
 }
 
-const borderColor = Color(0xFF805306);
+const borderColor = MyColors.primary;
 
 class FlutterFilemakerDesktop extends StatelessWidget {
   const FlutterFilemakerDesktop({Key? key}) : super(key: key);
