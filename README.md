@@ -11,3 +11,27 @@ Once installed, have your Appwrite Server URL and Appwrite Project ID available,
 
 ## Roadmap
 Initial focus will be on Windows (>10), once the basic features are built out and working, additional platform support will be added (Linux, Android - MacOS and iOS last, unless someone decides to take that portion of the project.)
+
+#### Main App
+- Window
+  - [ ] resizable
+  - [ ] custom window controls
+  - [ ] custom menu button
+  - [ ] movable
+- Create elements
+  - [ ] label
+  - [ ] text box
+  - [ ] textarea
+  - [ ] check box
+
+#### Database
+- Select Database Connector
+  - [ ] SQLite3 (local)
+  - [ ] Appwrite (Self-hosted)
+  - [ ] Firebase (cloud hosted)
+  - [ ] Other? (Maybe some other type of standard backend, MySQL, Postgresql, etc)
+- Appwrite Support
+  - [ ] connect to Appwrite DB
+  - create initial database collections
+    - [ ] layouts
+    - [ ] layout_elements
