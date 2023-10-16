@@ -37,7 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   appwrite: ^9.0.0
   shared_preferences: ^2.2.1
-  bitsdojo_window: ^0.1.5
+  # bitsdojo_window: ^0.1.5
 
 dev_dependencies:
   flutter_test:
