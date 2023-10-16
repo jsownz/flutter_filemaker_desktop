@@ -1,5 +1,6 @@
 // import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 // class TopBar extends StatelessWidget {
 //   const TopBar({super.key});
@@ -66,6 +67,23 @@ class TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Row(children: []);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text('Text'),
+        MenuBar(
+          children: [
+            SubmenuButton(menuChildren: [
+              MenuItemButton(
+                // onPressed: () {
+                //   print("test");
+                // },
+                child: const Text("About"),
+              )
+            ], child: Text("File"))
+          ],
+        ),
+      ],
+    );
   }
 }
