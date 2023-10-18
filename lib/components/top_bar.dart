@@ -1,6 +1,5 @@
 // import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 // class TopBar extends StatelessWidget {
 //   const TopBar({super.key});
@@ -63,24 +62,63 @@ import 'package:flutter/services.dart';
 // }
 
 class TopBar extends StatelessWidget {
-  const TopBar({super.key});
+  TopBar({super.key});
+
+  List<DropdownMenuEntry> layoutEntries = [];
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('Text'),
-        MenuBar(
-          children: [
-            SubmenuButton(menuChildren: [
-              MenuItemButton(
-                // onPressed: () {
-                //   print("test");
-                // },
-                child: const Text("About"),
+        layoutEntries.isNotEmpty
+            ? Row(
+                children: [
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  const Text('Layout: '),
+                  DropdownMenu(dropdownMenuEntries: layoutEntries)
+                ],
               )
-            ], child: Text("File"))
+            : const SizedBox(
+                width: 10,
+              ),
+        MenuBar(
+          style: MenuStyle(
+            elevation: MaterialStateProperty.resolveWith<double>(
+              // As you said you dont need elevation. I'm returning 0 in both case
+              (Set<MaterialState> states) {
+                if (states.contains(MaterialState.disabled)) {
+                  return 0;
+                }
+                return 0; // Defer to the widget's default.
+              },
+            ),
+            backgroundColor: MaterialStateProperty.resolveWith<Color>(
+              (Set<MaterialState> states) {
+                if (states.contains(MaterialState.disabled)) {
+                  return Colors.transparent;
+                }
+                return Colors.transparent; // Defer to the widget's default.
+              },
+            ),
+          ),
+          children: [
+            SubmenuButton(
+              menuChildren: const [
+                MenuItemButton(
+                  // onPressed: () {
+                  //   print("test");
+                  // },
+                  child: Text("About"),
+                )
+              ],
+              style: SubmenuButton.styleFrom(
+                alignment: Alignment.center,
+              ),
+              child: const Icon(Icons.menu),
+            )
           ],
         ),
       ],

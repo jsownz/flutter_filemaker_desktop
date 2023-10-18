@@ -6,11 +6,11 @@ class MainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         TopBar(),
-        Expanded(
+        const Expanded(
           child: Center(
             child: Text("Main Screen"),
           ),
