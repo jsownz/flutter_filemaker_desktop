@@ -35,3 +35,7 @@ Initial focus will be on Windows (>10), once the basic features are built out an
   - create initial database collections
     - [ ] layouts
     - [ ] layout_elements
+
+
+### Build notes
+- riverpod build_runner for generating providers with riverpod annotation: dart run build_runner watch
