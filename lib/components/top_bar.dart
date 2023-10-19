@@ -1,89 +1,26 @@
-// import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_filemaker_desktop/providers/selected_layout_provider.dart';
 
-// class TopBar extends StatelessWidget {
-//   const TopBar({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return WindowTitleBarBox(
-//       child: Row(
-//         children: [Expanded(child: MoveWindow()), const WindowButtons()],
-//       ),
-//     );
-//   }
-// }
-
-// final buttonColors = WindowButtonColors(
-//     iconNormal: const Color(0xFF805306),
-//     mouseOver: const Color(0xFFF6A00C),
-//     mouseDown: const Color(0xFF805306),
-//     iconMouseOver: const Color(0xFF805306),
-//     iconMouseDown: const Color(0xFFFFD500));
-
-// final closeButtonColors = WindowButtonColors(
-//     mouseOver: const Color(0xFFD32F2F),
-//     mouseDown: const Color(0xFFB71C1C),
-//     iconNormal: const Color(0xFF805306),
-//     iconMouseOver: Colors.white);
-
-// class WindowButtons extends StatefulWidget {
-//   const WindowButtons({Key? key}) : super(key: key);
-
-//   @override
-//   _WindowButtonsState createState() => _WindowButtonsState();
-// }
-
-// class _WindowButtonsState extends State<WindowButtons> {
-//   void maximizeOrRestore() {
-//     setState(() {
-//       appWindow.maximizeOrRestore();
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Row(
-//       children: [
-//         MinimizeWindowButton(colors: buttonColors),
-//         appWindow.isMaximized
-//             ? RestoreWindowButton(
-//                 colors: buttonColors,
-//                 onPressed: maximizeOrRestore,
-//               )
-//             : MaximizeWindowButton(
-//                 colors: buttonColors,
-//                 onPressed: maximizeOrRestore,
-//               ),
-//         CloseWindowButton(colors: closeButtonColors),
-//       ],
-//     );
-//   }
-// }
-
-class TopBar extends StatelessWidget {
+class TopBar extends ConsumerWidget {
   TopBar({super.key});
 
   List<DropdownMenuEntry> layoutEntries = [];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        layoutEntries.isNotEmpty
-            ? Row(
-                children: [
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  const Text('Layout: '),
-                  DropdownMenu(dropdownMenuEntries: layoutEntries)
-                ],
-              )
-            : const SizedBox(
-                width: 10,
-              ),
+        Row(
+          children: [
+            const SizedBox(
+              width: 10,
+            ),
+            Text('Layout: ${ref.watch(selectedLayoutProvider)}'),
+            DropdownMenu(dropdownMenuEntries: layoutEntries)
+          ],
+        ),
         MenuBar(
           style: MenuStyle(
             elevation: MaterialStateProperty.resolveWith<double>(

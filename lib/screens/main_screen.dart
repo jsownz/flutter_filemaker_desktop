@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_filemaker_desktop/components/top_bar.dart';
+import 'package:flutter_filemaker_desktop/screens/edit_layout_screen.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
@@ -11,9 +12,7 @@ class MainScreen extends StatelessWidget {
       children: [
         TopBar(),
         const Expanded(
-          child: Center(
-            child: Text("Main Screen"),
-          ),
+          child: EditLayoutScreen(),
         ),
       ],
     );
