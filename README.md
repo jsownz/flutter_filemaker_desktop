@@ -38,4 +38,7 @@ Initial focus will be on Windows (>10), once the basic features are built out an
 
 
 ### Build notes
+#### Riverpod
 - riverpod build_runner for generating providers with riverpod annotation: dart run build_runner watch
+#### SQLite3
+- Linux: sudo apt-get -y install libsqlite3-0 libsqlite3-dev

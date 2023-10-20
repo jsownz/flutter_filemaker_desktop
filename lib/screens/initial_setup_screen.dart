@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter_filemaker_desktop/components/top_bar.dart';
 import 'package:flutter_filemaker_desktop/screens/welcome_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,6 +19,8 @@ class _InitialSetupScreenState extends State<InitialSetupScreen> {
     final SharedPreferences prefs = await _prefs;
     switch (_connector) {
       case 0:
+        break;
+      case 1:
         prefs.setString('dbConnector', 'appwrite');
         prefs.setString('appwriteUrl', _appwriteUrl);
         prefs
@@ -38,10 +39,9 @@ class _InitialSetupScreenState extends State<InitialSetupScreen> {
   bool fieldsComplete() {
     switch (_connector) {
       case 0:
-        return _appwriteUrl.isNotEmpty && _appwriteProjectId.isNotEmpty;
-      case 1:
-        // return _appwriteUrl.isNotEmpty && _appwriteProjectId.isNotEmpty;
         break;
+      case 1:
+        return _appwriteUrl.isNotEmpty && _appwriteProjectId.isNotEmpty;
       case 2:
         break;
     }
@@ -58,15 +58,15 @@ class _InitialSetupScreenState extends State<InitialSetupScreen> {
           Wrap(
             spacing: 5.0,
             children: [
-              // ChoiceChip(
-              //   label: const Text('Local Sqlite3'),
-              //   selected: _connector == 0,
-              //   onSelected: (bool selected) {
-              //     setState(() {
-              //       _connector = selected ? 0 : null;
-              //     });
-              //   },
-              // ),
+              ChoiceChip(
+                label: const Text('Local Sqlite3'),
+                selected: _connector == 0,
+                onSelected: (bool selected) {
+                  setState(() {
+                    _connector = selected ? 0 : null;
+                  });
+                },
+              ),
               ChoiceChip(
                 label: const Text('Appwrite'),
                 selected: _connector == 0,
