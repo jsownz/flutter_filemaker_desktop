@@ -1,5 +1,5 @@
 class DBConnection {
-  int id;
+  int? id;
   final String connection_name;
   final int type; // 0: SQLite3 1: Appwrite 2: Firebase
   final String database_name;
@@ -7,7 +7,7 @@ class DBConnection {
   String app_id = '';
 
   DBConnection({
-    this.id = 0,
+    this.id,
     required this.connection_name,
     required this.type,
     required this.database_name,
