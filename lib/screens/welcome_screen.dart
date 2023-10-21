@@ -1,5 +1,6 @@
 // import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_filemaker_desktop/connectors/sqlite_connector.dart';
 import 'package:flutter_filemaker_desktop/models/db_connection.dart';
 import 'package:flutter_filemaker_desktop/screens/initial_setup_screen.dart';
 import 'package:flutter_filemaker_desktop/screens/main_screen.dart';
@@ -44,8 +45,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   //     },
   //   );
   // }
+  SqliteConnector sqliteConnector = SqliteConnector();
   late var connectionDatabase;
-  int? _connector = 0;
+  int _connector = 0;
   String _connectionName = "";
   String _databaseName = "";
   String _connectionUri = "";
@@ -54,6 +56,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Future<void> _setDBConnectorOptions() async {
     switch (_connector) {
       case 0:
+        DBConnection connection = DBConnection(
+            connection_name: _connectionName,
+            type: _connector,
+            database_name: _databaseName,
+            connection_uri: _connectionUri,
+            app_id: _appId);
+
+        insertConnection(connection);
         break;
       case 1:
         break;
@@ -63,7 +73,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   bool fieldsComplete() {
     switch (_connector) {
       case 0:
-        break;
+        return _connectionUri.isNotEmpty;
       case 1:
         return _connectionUri.isNotEmpty && _appId.isNotEmpty;
       case 2:
@@ -74,16 +84,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   void setupDatabase() async {
     WidgetsFlutterBinding.ensureInitialized();
-    final connectionDatabase = openDatabase(
-      join(await getDatabasesPath(), 'connection_database.db'),
-      onCreate: (db, version) {
-        // Run the CREATE TABLE statement on the database.
-        return db.execute(
-          'CREATE TABLE connections(id INTEGER PRIMARY KEY, connection_name TEXT, type INTEGER, database_name TEXT, connection_uri TEXT, app_id TEXT)',
-        );
-      },
-      version: 1,
-    );
+    connectionDatabase = sqliteConnector.connect();
   }
 
   Future<List<DBConnection>> getConnections() async {
@@ -125,7 +126,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   void initState() {
     setupDatabase();
-    getConnections();
     super.initState();
   }
 
@@ -136,6 +136,32 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          FutureBuilder<List<DBConnection>>(
+              future: getConnections(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData &&
+                    snapshot.connectionState == ConnectionState.done &&
+                    snapshot.data!.isNotEmpty) {
+                  return SizedBox(
+                    height: 300,
+                    child: ListView.builder(
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            color: Colors.blue,
+                            height: 50,
+                            width: 50,
+                            child: Text(snapshot.data![index].connection_uri),
+                          );
+                        }),
+                  );
+                } else if (snapshot.connectionState ==
+                    ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                } else {
+                  return const SizedBox();
+                }
+              }),
           Wrap(
             spacing: 5.0,
             children: [
@@ -144,7 +170,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 selected: _connector == 0,
                 onSelected: (bool selected) {
                   setState(() {
-                    _connector = selected ? 0 : null;
+                    _connector = selected ? 0 : 10;
                   });
                 },
               ),
@@ -153,7 +179,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 selected: _connector == 1,
                 onSelected: (bool selected) {
                   setState(() {
-                    _connector = selected ? 1 : null;
+                    _connector = selected ? 1 : 10;
                   });
                 },
               ),
