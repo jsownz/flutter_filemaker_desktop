@@ -1,4 +1,4 @@
-// import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_filemaker_desktop/connectors/sqlite_connector.dart';
 import 'package:flutter_filemaker_desktop/models/db_connection.dart';
@@ -16,35 +16,6 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-  // Future<bool> showSetupPage() async {
-  //   var sharedPreferences = await SharedPreferences.getInstance();
-
-  //   String? dbConnector = sharedPreferences.getString('dbConnector');
-
-  //   return dbConnector != null;
-  // }
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  // }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return FutureBuilder<bool>(
-  //     future: showSetupPage(),
-  //     builder: (context, snapshot) {
-  //       if (snapshot.hasData) {
-  //         if (snapshot.data!) {
-  //           return const MainScreen();
-  //         }
-  //         return const InitialSetupScreen();
-  //       } else {
-  //         return const InitialSetupScreen();
-  //       }
-  //     },
-  //   );
-  // }
   SqliteConnector sqliteConnector = SqliteConnector();
   late var connectionDatabase;
   int _connector = 0;
@@ -52,6 +23,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   String _databaseName = "";
   String _connectionUri = "";
   String _appId = "";
+  final AsyncMemoizer _memoizer = AsyncMemoizer();
 
   Future<void> _setDBConnectorOptions() async {
     switch (_connector) {
@@ -73,9 +45,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   bool fieldsComplete() {
     switch (_connector) {
       case 0:
-        return _connectionUri.isNotEmpty;
+        return _connectionName.isNotEmpty && _connectionUri.isNotEmpty;
       case 1:
-        return _connectionUri.isNotEmpty && _appId.isNotEmpty;
+        return _connectionName.isNotEmpty &&
+            _connectionUri.isNotEmpty &&
+            _appId.isNotEmpty;
       case 2:
         break;
     }
@@ -87,40 +61,30 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     connectionDatabase = sqliteConnector.connect();
   }
 
-  Future<List<DBConnection>> getConnections() async {
-    // Get a reference to the database.
-    final db = await connectionDatabase;
+  Future<dynamic> getConnections() {
+    return _memoizer.runOnce(() async {
+      final db = await connectionDatabase;
 
-    // Query the table for all connections.
-    final List<Map<String, dynamic>> savedConnections =
-        await db.query('connections');
+      // Query the table for all connections.
+      final List<Map<String, dynamic>> savedConnections =
+          await db.query('connections');
 
-    // Convert the List<Map<String, dynamic> into a List<Dog>.
-    return List.generate(savedConnections.length, (i) {
-      return DBConnection(
-        id: savedConnections[i]['id'],
-        connection_name: savedConnections[i]['connection_name'],
-        type: savedConnections[i]['type'],
-        database_name: savedConnections[i]['database_name'],
-        connection_uri: savedConnections[i]['connection_uri'],
-        app_id: savedConnections[i]['app_id'],
-      );
+      // Convert the List<Map<String, dynamic> into a List<Dog>.
+      return List.generate(savedConnections.length, (i) {
+        return DBConnection(
+          id: savedConnections[i]['id'],
+          connection_name: savedConnections[i]['connection_name'],
+          type: savedConnections[i]['type'],
+          database_name: savedConnections[i]['database_name'],
+          connection_uri: savedConnections[i]['connection_uri'],
+          app_id: savedConnections[i]['app_id'],
+        );
+      });
     });
   }
 
   Future<void> insertConnection(DBConnection connection) async {
-    // Get a reference to the database.
-    final db = await connectionDatabase;
-
-    // Insert the Dog into the correct table. You might also specify the
-    // `conflictAlgorithm` to use in case the same dog is inserted twice.
-    //
-    // In this case, replace any previous data.
-    await db.insert(
-      'connections',
-      connection.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    sqliteConnector.insert(connectionDatabase, 'connections', connection);
   }
 
   @override
@@ -136,7 +100,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          FutureBuilder<List<DBConnection>>(
+          FutureBuilder<dynamic>(
               future: getConnections(),
               builder: (context, snapshot) {
                 if (snapshot.hasData &&
@@ -144,14 +108,23 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     snapshot.data!.isNotEmpty) {
                   return SizedBox(
                     height: 300,
-                    child: ListView.builder(
+                    child: GridView.builder(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 6, // number of items in each row
+                          mainAxisSpacing: 8.0, // spacing between rows
+                          crossAxisSpacing: 8.0, // spacing between columns
+                        ),
                         itemCount: snapshot.data!.length,
                         itemBuilder: (context, index) {
                           return Container(
                             color: Colors.blue,
                             height: 50,
                             width: 50,
-                            child: Text(snapshot.data![index].connection_uri),
+                            child: Text(
+                                snapshot.data![index].connection_name.length > 0
+                                    ? snapshot.data![index].connection_name
+                                    : snapshot.data![index].connection_uri),
                           );
                         }),
                   );
@@ -203,6 +176,18 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   TextField(
                     onChanged: (String value) {
                       setState(() {
+                        _connectionName = value;
+                      });
+                    },
+                    autocorrect: false,
+                    decoration: const InputDecoration(
+                      labelText: 'Connection Name',
+                      hintText: 'Connection 1',
+                    ),
+                  ),
+                  TextField(
+                    onChanged: (String value) {
+                      setState(() {
                         _connectionUri = value;
                       });
                     },
@@ -222,6 +207,18 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               width: MediaQuery.of(context).size.width * 0.35,
               child: Column(
                 children: [
+                  TextField(
+                    onChanged: (String value) {
+                      setState(() {
+                        _connectionName = value;
+                      });
+                    },
+                    autocorrect: false,
+                    decoration: const InputDecoration(
+                      labelText: 'Connection Name',
+                      hintText: 'Connection 1',
+                    ),
+                  ),
                   TextField(
                     onChanged: (String value) {
                       setState(() {

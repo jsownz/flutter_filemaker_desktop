@@ -1,3 +1,4 @@
+import 'package:flutter_filemaker_desktop/models/db_connection.dart';
 import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -16,5 +17,19 @@ class SqliteConnector {
       version: 1,
     );
     return connectionDatabase;
+  }
+
+  insert(
+    connectionDatabase,
+    String table,
+    dynamic model,
+  ) async {
+    final db = await connectionDatabase;
+
+    await db.insert(
+      table,
+      model.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 }
